@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('recepie_ingredients', function (Blueprint $table) {
             $table->id();
             $table->foreignId('recepie_id')
+                ->nullable()
                 ->constrained('recepies')
                 ->onDelete('cascade');
             $table->foreignId('user_recepie_id')
+                ->nullable()
                 ->constrained('user_recepies')
                 ->onDelete('cascade');
             $table->string('name');

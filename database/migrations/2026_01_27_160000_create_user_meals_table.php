@@ -20,12 +20,15 @@ return new class extends Migration
                 ->constrained('diary_notes')
                 ->onDelete('cascade');
             $table->foreignId('product_id')
+                ->nullable()
                 ->constrained('products')
                 ->onDelete('cascade');
             $table->foreignId('recepie_id')
+                ->nullable()
                 ->constrained('recepies')
                 ->onDelete('cascade');
             $table->foreignId('dish_id')
+                ->nullable()
                 ->constrained('dishes')
                 ->onDelete('cascade');
             $table->enum('meal_type', ['breakfast', 'lunch', 'dinner', 'snack']);

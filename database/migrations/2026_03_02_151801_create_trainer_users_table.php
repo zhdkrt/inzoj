@@ -20,8 +20,8 @@ return new class extends Migration
             $table->date('birthday')->nullable();
             $table->integer('experience')->nullable();
             $table->text('achievements')->nullable();
-            $table->ineger('rating')->nullable();
-            $table->ineger('rating_count')->nullable();
+            $table->integer('rating')->nullable();
+            $table->integer('rating_count')->nullable();
             $table->timestamps();
         });
     }
