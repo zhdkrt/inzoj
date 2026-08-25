@@ -212,6 +212,46 @@ use Illuminate\Http\Request;
  *     
  *     @OA\Response(response=401, description="Unauthenticated")
  * )
+ *
+ * @OA\Post(
+ *     path="/api/diary/meal/recepie/create",
+ *     summary="Create a user recipe",
+ *     description="Creates a user recipe and sends it to moderation. The author can use it immediately; other users see it only after approval.",
+ *     operationId="createUserRecepie",
+ *     tags={"Diary - Recipes"},
+ *     security={{"userSanctumToken": {}}},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="application/json",
+ *             @OA\Schema(
+ *                 required={"name", "instructions", "calories", "proteins", "fats", "carbs"},
+ *                 @OA\Property(property="name", type="string", example="Oatmeal"),
+ *                 @OA\Property(property="instructions", type="string", example="Mix oats with water"),
+ *                 @OA\Property(property="calories", type="number", example=150),
+ *                 @OA\Property(property="proteins", type="number", example=5),
+ *                 @OA\Property(property="fats", type="number", example=3),
+ *                 @OA\Property(property="carbs", type="number", example=27),
+ *                 @OA\Property(
+ *                     property="ingredient_ids",
+ *                     type="array",
+ *                     @OA\Items(type="integer"),
+ *                     example={1, 2}
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="Recipe submitted for moderation",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Recipe submitted for moderation"),
+ *             @OA\Property(property="recepie", ref="#/components/schemas/UserRecepie")
+ *         )
+ *     ),
+ *     @OA\Response(response=401, description="Unauthenticated")
+ * )
  */
 
 class RecepieController extends Controller

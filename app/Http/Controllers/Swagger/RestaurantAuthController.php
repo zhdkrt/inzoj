@@ -12,6 +12,40 @@ use Illuminate\Http\Request;
  * )
  * 
  * @OA\Post(
+ *     path="/api/restaurant/register",
+ *     summary="Restaurant registration",
+ *     description="Register a restaurant. The restaurant stays hidden until a moderator approves it.",
+ *     operationId="restaurantRegister",
+ *     tags={"Restaurant Authentication"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="application/json",
+ *             @OA\Schema(
+ *                 required={"email", "password", "password_confirmation", "restaurant_name", "restaurant_type"},
+ *                 @OA\Property(property="email", type="string", format="email", example="new.restaurant@gmail.com"),
+ *                 @OA\Property(property="password", type="string", format="password", example="password123"),
+ *                 @OA\Property(property="password_confirmation", type="string", format="password", example="password123"),
+ *                 @OA\Property(property="restaurant_name", type="string", example="New Cafe"),
+ *                 @OA\Property(property="restaurant_type", type="string", enum={"cafe", "canteen", "fine_restaurant", "fast_food", "bistro", "pub", "bar", "other"}),
+ *                 @OA\Property(property="name", type="string", nullable=true, example="Contact name")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="Registration successful, pending moderation",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="token", type="string"),
+ *             @OA\Property(property="moderation_status", type="string", example="pending"),
+ *             @OA\Property(property="message", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(response=422, description="Validation error")
+ * )
+ *
+ * @OA\Post(
  *     path="/api/restaurant/login",
  *     summary="Restaurant login",
  *     description="Authenticate restaurant and return access token",

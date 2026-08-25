@@ -15,8 +15,12 @@
     },
     "servers": [
         {
-            "url": "http://inzoj.local",
-            "description": "API Server"
+            "url": "/",
+            "description": "Current host"
+        },
+        {
+            "url": "http://localhost",
+            "description": "Configured host"
         }
     ],
     "paths": {
@@ -1595,6 +1599,579 @@
                 ]
             }
         },
+        "/api/moderator/queue": {
+            "get": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Pending counts",
+                "operationId": "moderatorQueue",
+                "responses": {
+                    "200": {
+                        "description": "Pending counts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "pending": {
+                                            "properties": {
+                                                "recipes": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "restaurants": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "trainers": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Moderator access required"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/moderator/recipes": {
+            "get": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "List user recipes for moderation",
+                "operationId": "moderatorRecipes",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "default": "pending",
+                            "enum": [
+                                "pending",
+                                "approved",
+                                "rejected",
+                                "all"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recipe list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "recipes": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/UserRecepie"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/moderator/recipes/{id}": {
+            "get": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Get user recipe details",
+                "operationId": "moderatorShowRecipe",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recipe details"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Approve or reject a user recipe",
+                "operationId": "moderatorReviewRecipe",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "action"
+                                ],
+                                "properties": {
+                                    "action": {
+                                        "type": "string",
+                                        "enum": [
+                                            "approve",
+                                            "reject"
+                                        ],
+                                        "example": "approve"
+                                    },
+                                    "comment": {
+                                        "type": "string",
+                                        "example": "Looks good",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Reviewed"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/moderator/restaurants": {
+            "get": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "List restaurants for moderation",
+                "operationId": "moderatorRestaurants",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "default": "pending",
+                            "enum": [
+                                "pending",
+                                "approved",
+                                "rejected",
+                                "all"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Restaurant list"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/moderator/restaurants/{id}": {
+            "get": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Get restaurant details",
+                "operationId": "moderatorShowRestaurant",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Restaurant details"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Approve or reject a restaurant",
+                "operationId": "moderatorReviewRestaurant",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "action"
+                                ],
+                                "properties": {
+                                    "action": {
+                                        "type": "string",
+                                        "enum": [
+                                            "approve",
+                                            "reject"
+                                        ],
+                                        "example": "approve"
+                                    },
+                                    "comment": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Reviewed"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/moderator/trainers": {
+            "get": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "List trainers for moderation",
+                "operationId": "moderatorTrainers",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "default": "pending",
+                            "enum": [
+                                "pending",
+                                "approved",
+                                "rejected",
+                                "all"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Trainer list"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/moderator/trainers/{id}": {
+            "get": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Get trainer details",
+                "operationId": "moderatorShowTrainer",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Trainer details"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Approve or reject a trainer",
+                "operationId": "moderatorReviewTrainer",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "action"
+                                ],
+                                "properties": {
+                                    "action": {
+                                        "type": "string",
+                                        "enum": [
+                                            "approve",
+                                            "reject"
+                                        ],
+                                        "example": "approve"
+                                    },
+                                    "comment": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Reviewed"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/moderator/login": {
+            "post": {
+                "tags": [
+                    "Moderator Authentication"
+                ],
+                "summary": "Moderator login",
+                "operationId": "moderatorLogin",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "moderator@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "1|abcdefghijklmnopqrstuvwxyz"
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "moderator@gmail.com"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Moderator",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/moderator/logout": {
+            "post": {
+                "tags": [
+                    "Moderator Authentication"
+                ],
+                "summary": "Moderator logout",
+                "operationId": "moderatorLogout",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logged out successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Moderator access required"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            }
+        },
         "/api/premium/purchase": {
             "post": {
                 "tags": [
@@ -3053,6 +3630,200 @@
                         "userSanctumToken": []
                     }
                 ]
+            }
+        },
+        "/api/diary/meal/recepie/create": {
+            "post": {
+                "tags": [
+                    "Diary - Recipes"
+                ],
+                "summary": "Create a user recipe",
+                "description": "Creates a user recipe and sends it to moderation. The author can use it immediately; other users see it only after approval.",
+                "operationId": "createUserRecepie",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "instructions",
+                                    "calories",
+                                    "proteins",
+                                    "fats",
+                                    "carbs"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Oatmeal"
+                                    },
+                                    "instructions": {
+                                        "type": "string",
+                                        "example": "Mix oats with water"
+                                    },
+                                    "calories": {
+                                        "type": "number",
+                                        "example": 150
+                                    },
+                                    "proteins": {
+                                        "type": "number",
+                                        "example": 5
+                                    },
+                                    "fats": {
+                                        "type": "number",
+                                        "example": 3
+                                    },
+                                    "carbs": {
+                                        "type": "number",
+                                        "example": 27
+                                    },
+                                    "ingredient_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Recipe submitted for moderation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Recipe submitted for moderation"
+                                        },
+                                        "recepie": {
+                                            "$ref": "#/components/schemas/UserRecepie"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/restaurant/register": {
+            "post": {
+                "tags": [
+                    "Restaurant Authentication"
+                ],
+                "summary": "Restaurant registration",
+                "description": "Register a restaurant. The restaurant stays hidden until a moderator approves it.",
+                "operationId": "restaurantRegister",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password",
+                                    "password_confirmation",
+                                    "restaurant_name",
+                                    "restaurant_type"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "new.restaurant@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "restaurant_name": {
+                                        "type": "string",
+                                        "example": "New Cafe"
+                                    },
+                                    "restaurant_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "cafe",
+                                            "canteen",
+                                            "fine_restaurant",
+                                            "fast_food",
+                                            "bistro",
+                                            "pub",
+                                            "bar",
+                                            "other"
+                                        ]
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Contact name",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Registration successful, pending moderation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "token": {
+                                            "type": "string"
+                                        },
+                                        "moderation_status": {
+                                            "type": "string",
+                                            "example": "pending"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
             }
         },
         "/api/restaurant/login": {
@@ -7114,6 +7885,24 @@
                         "example": 42,
                         "nullable": true
                     },
+                    "moderation_status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "approved",
+                            "rejected"
+                        ],
+                        "example": "approved"
+                    },
+                    "moderated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "moderation_comment": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "created_at": {
                         "description": "Creation timestamp",
                         "type": "string",
@@ -7250,6 +8039,24 @@
                             "bar",
                             "other"
                         ],
+                        "nullable": true
+                    },
+                    "moderation_status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "approved",
+                            "rejected"
+                        ],
+                        "example": "approved"
+                    },
+                    "moderated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "moderation_comment": {
+                        "type": "string",
                         "nullable": true
                     },
                     "created_at": {
@@ -7568,6 +8375,74 @@
                 },
                 "type": "object"
             },
+            "UserRecepie": {
+                "title": "User Recipe",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Oatmeal"
+                    },
+                    "instructions": {
+                        "type": "string",
+                        "example": "Mix oats with water"
+                    },
+                    "calories": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 150
+                    },
+                    "proteins": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 5
+                    },
+                    "fats": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 3
+                    },
+                    "carbs": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 27
+                    },
+                    "moderation_status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "approved",
+                            "rejected"
+                        ],
+                        "example": "pending"
+                    },
+                    "moderated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "moderation_comment": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "Activity": {
                 "title": "Activity",
                 "properties": {
@@ -7610,6 +8485,12 @@
                 "description": "Enter restaurant sanctum token (from Restaurant Auth)",
                 "bearerFormat": "sanctum",
                 "scheme": "bearer"
+            },
+            "moderatorSanctumToken": {
+                "type": "http",
+                "description": "Enter moderator sanctum token (from Moderator Auth)",
+                "bearerFormat": "sanctum",
+                "scheme": "bearer"
             }
         }
     },
@@ -7629,6 +8510,14 @@
         {
             "name": "Diary - Meal",
             "description": "Meals management endpoints (products and recipes)"
+        },
+        {
+            "name": "Moderation",
+            "description": "Moderator queue for recipes, restaurants and trainers"
+        },
+        {
+            "name": "Moderator Authentication",
+            "description": "Moderator authentication endpoints"
         },
         {
             "name": "Premium",

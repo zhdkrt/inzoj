@@ -27,7 +27,7 @@
             'other' => 'Другое'
         ]
         @endphp
-        <span>{{ $goal_convertor[Auth::user()->goal] }}</span>
+        <span>{{ $goal_convertor[Auth::user()->goal] ?? 'Не указано' }}</span>
     </div>
 
     

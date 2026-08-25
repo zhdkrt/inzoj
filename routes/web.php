@@ -30,6 +30,9 @@ use App\Http\Controllers\TrainerUser\TrainerAuthController;
 use App\Http\Controllers\TrainerUser\TrainerDataController;
 use App\Http\Controllers\TrainerUser\TrainerTrainingController;
 
+use App\Http\Controllers\Moderator\ModeratorAuthController;
+use App\Http\Controllers\Moderator\ModerationController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -63,7 +66,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('user.login.form')
 
 Route::middleware('auth:web')->group(function () {
     Route::get('/questionnaire', [QuestionnaireController::class, 'show'])->name('questionnaire');
-    Route::post('/questionnaire/update', [QuestionnaireController::class, 'update'])->name('questionnaire');
+    Route::post('/questionnaire/update', [QuestionnaireController::class, 'update'])->name('questionnaire.update');
     Route::get('/premium', [PremiumController::class, 'show'])->name('premium');
     Route::post('/premium/purchase', [PremiumController::class, 'purchase'])->name('premium.purchase');
 
@@ -160,5 +163,32 @@ Route::prefix('trainer-user')->name('trainerUser.')->group(function () {
         Route::get('/new-training', [TrainerTrainingController::class, 'newTraining'])->name('newTraining');
         Route::post('/training-action', [TrainerTrainingController::class, 'trainingAction'])->name('trainingAction');
         Route::get('/training', [TrainerTrainingController::class, 'editTraining'])->name('editTraining');
+    });
+});
+
+Route::prefix('moderator')->name('moderator.')->group(function () {
+    Route::get('/login', function () {
+        if (auth('moderator')->check()) {
+            return redirect()->route('moderator.queue');
+        }
+        return view('moderator.login');
+    })->name('login');
+    Route::post('/login', [ModeratorAuthController::class, 'login'])->name('loginCheck');
+
+    Route::middleware('auth:moderator')->group(function () {
+        Route::post('/logout', [ModeratorAuthController::class, 'logout'])->name('logout');
+        Route::get('/', [ModerationController::class, 'queue'])->name('queue');
+
+        Route::get('/recipes', [ModerationController::class, 'recipes'])->name('recipes');
+        Route::get('/recipes/{id}', [ModerationController::class, 'showRecipe'])->name('recipes.show');
+        Route::post('/recipes/{id}', [ModerationController::class, 'reviewRecipe'])->name('recipes.review');
+
+        Route::get('/restaurants', [ModerationController::class, 'restaurants'])->name('restaurants');
+        Route::get('/restaurants/{id}', [ModerationController::class, 'showRestaurant'])->name('restaurants.show');
+        Route::post('/restaurants/{id}', [ModerationController::class, 'reviewRestaurant'])->name('restaurants.review');
+
+        Route::get('/trainers', [ModerationController::class, 'trainers'])->name('trainers');
+        Route::get('/trainers/{id}', [ModerationController::class, 'showTrainer'])->name('trainers.show');
+        Route::post('/trainers/{id}', [ModerationController::class, 'reviewTrainer'])->name('trainers.review');
     });
 });

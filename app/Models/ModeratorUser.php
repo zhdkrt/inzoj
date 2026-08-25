@@ -4,26 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class RestaurantUser extends Authenticatable
+class ModeratorUser extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, HasApiTokens;
+
+    protected $table = 'moderator_users';
 
     protected $fillable = [
-        'name',
         'email',
         'password',
-        'restaurant_id'
+        'name',
     ];
 
     protected $hidden = [
         'password',
     ];
-
-    public function restaurant()
-    {
-        return $this->belongsTo(\App\Models\Restaurants\Restaurant::class);
-    }
 }

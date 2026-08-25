@@ -13,6 +13,10 @@ class Training extends Model
         return $this->hasMany(UserTraining::class, 'training_id', 'id');
     }
 
+    public function trainerUser() {
+        return $this->belongsTo(TrainerUser::class, 'trainer_user_id');
+    }
+
     protected $fillable = [
         'trainer_user_id',
         'name', 

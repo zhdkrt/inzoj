@@ -50,6 +50,11 @@ return [
             'driver' => 'session',
             'provider' => 'trainers',
         ],
+
+        'moderator' => [
+            'driver' => 'session',
+            'provider' => 'moderators',
+        ],
     ],
 
     /*
@@ -88,6 +93,11 @@ return [
         'trainers' => [
             'driver' => 'eloquent',
             'model' => App\Models\TrainerUser::class,
+        ],
+
+        'moderators' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\ModeratorUser::class,
         ],
     ],
 

@@ -71,7 +71,19 @@ class MealController extends Controller
                 $recepies = Recepie::limit(16)->get();
             }
             $userRecepies = UserRecepie::where('user_id', $user->id)->get();
-            $allRecepies = $userRecepies->concat($recepies);
+            $publicUserRecepies = UserRecepie::approved()
+                ->where('user_id', '!=', $user->id)
+                ->limit(16)
+                ->get();
+
+            $userRecepies->each(function ($recepie) {
+                $recepie->setAttribute('is_user_recepie', true);
+            });
+            $publicUserRecepies->each(function ($recepie) {
+                $recepie->setAttribute('is_user_recepie', true);
+            });
+
+            $allRecepies = $userRecepies->concat($publicUserRecepies)->concat($recepies);
 
             foreach ($allRecepies as $recepie) {
                 if (in_array($recepie->id, $favoriteRecepiesId)) {

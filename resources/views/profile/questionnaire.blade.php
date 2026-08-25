@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('questionnaire') }}">
+    <form method="POST" action="{{ route('questionnaire.update') }}">
         @csrf
         <input type="hidden" name="step" value="{{ $step }}">
         

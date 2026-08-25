@@ -33,7 +33,7 @@ return [
     |
     */
 
-    'guard' => ['web', 'trainer', 'restaurant'],
+    'guard' => ['web', 'trainer', 'restaurant', 'moderator'],
 
     /*
     |--------------------------------------------------------------------------

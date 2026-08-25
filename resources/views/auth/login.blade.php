@@ -26,6 +26,7 @@
         <a href="./register" class="font-medium text-indigo-600">Зарегистрироваться</a>
         <a href="{{ route('restaurantUser.login') }}" class="font-medium text-indigo-600">Войти под аккаунтом ресторана</a>
         <a href="{{ route('trainerUser.login') }}" class="font-medium text-indigo-600">Войти под аккаунтом тренера</a>
+        <a href="{{ route('moderator.login') }}" class="font-medium text-indigo-600">Войти как модератор</a>
     </div>
 </form>
 @endsection

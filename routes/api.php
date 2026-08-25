@@ -30,6 +30,9 @@ use App\Http\Controllers\TrainerUser\TrainerAuthController;
 use App\Http\Controllers\TrainerUser\TrainerDataController;
 use App\Http\Controllers\TrainerUser\TrainerTrainingController;
 
+use App\Http\Controllers\Moderator\ModeratorAuthController;
+use App\Http\Controllers\Moderator\ModerationController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -46,10 +49,13 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Аутентификация ресторанов
 Route::post('/restaurant/login', [RestaurantAuthController::class, 'login']);
+Route::post('/restaurant/register', [RestaurantAuthController::class, 'register']);
 
 // Аутентификация тренеров
 Route::post('/trainer/login', [TrainerAuthController::class, 'login']);
 Route::post('/trainer/register', [TrainerAuthController::class, 'register']);
+
+Route::post('/moderator/login', [ModeratorAuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {    
     // ==================== (Авторизованные пользователи) ====================
@@ -103,6 +109,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::get('/', [RecepieController::class, 'show']);
                 Route::post('/add', [RecepieController::class, 'addMealRecepie']);
                 Route::put('/update', [RecepieController::class, 'updateMealRecepie']);
+                Route::post('/create', [RecepieController::class, 'createUserRecepie']);
             });
             
             // Фильтры
@@ -185,6 +192,23 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/training/update', [TrainerTrainingController::class, 'updateTraining']);
             Route::delete('/training/delete', [TrainerTrainingController::class, 'deleteTraining']);
         });
+    });
+
+    Route::middleware('moderator')->prefix('moderator')->group(function () {
+        Route::post('/logout', [ModeratorAuthController::class, 'logout']);
+        Route::get('/queue', [ModerationController::class, 'queue']);
+
+        Route::get('/recipes', [ModerationController::class, 'recipes']);
+        Route::get('/recipes/{id}', [ModerationController::class, 'showRecipe']);
+        Route::post('/recipes/{id}', [ModerationController::class, 'reviewRecipe']);
+
+        Route::get('/restaurants', [ModerationController::class, 'restaurants']);
+        Route::get('/restaurants/{id}', [ModerationController::class, 'showRestaurant']);
+        Route::post('/restaurants/{id}', [ModerationController::class, 'reviewRestaurant']);
+
+        Route::get('/trainers', [ModerationController::class, 'trainers']);
+        Route::get('/trainers/{id}', [ModerationController::class, 'showTrainer']);
+        Route::post('/trainers/{id}', [ModerationController::class, 'reviewTrainer']);
     });
 });
 

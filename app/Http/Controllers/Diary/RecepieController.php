@@ -26,6 +26,15 @@ class RecepieController extends Controller
         $isUserRecepie = $request->is_user_recepie ?? null;
         if ($isUserRecepie !== null) {
             $recepie = UserRecepie::where('id', $recepieId)->first();
+            if ($recepie && $recepie->user_id !== Auth::id() && !$recepie->isApproved()) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Recipe is not available'
+                    ], 403);
+                }
+                abort(403);
+            }
         } else {
             $recepie = Recepie::where('id', $recepieId)->first();
         }
@@ -119,25 +128,29 @@ class RecepieController extends Controller
             'calories' => $calories,
             'proteins' =>  $proteins,
             'fats' => $fats,
-            'carbs' => $carbs
+            'carbs' => $carbs,
+            'moderation_status' => UserRecepie::MODERATION_PENDING,
         ]);
 
-        $ingredientIds = $request->get('ingredient_ids');
+        $ingredientIds = $request->get('ingredient_ids', []);
         $userRecepieId = $recepie->id;
-        $data = array_map(function ($ingredientId) use ($userRecepieId) {
-            return [
-                'user_recepie_id' => $userRecepieId,
-                'ingredient_id' => $ingredientId
-            ];
-        }, $ingredientIds);
-        
-        UserRecepieIngridient::insert($data);        
+        if (is_array($ingredientIds) && count($ingredientIds) > 0) {
+            $data = array_map(function ($ingredientId) use ($userRecepieId) {
+                return [
+                    'user_recepie_id' => $userRecepieId,
+                    'ingredient_id' => $ingredientId
+                ];
+            }, $ingredientIds);
+            
+            UserRecepieIngridient::insert($data);
+        }
 
         if ($request && $request->expectsJson()) {           
             return response()->json([
                 'success' => true,
-                'message' => 'Recipe created successfully',
-            ]);
+                'message' => 'Recipe submitted for moderation',
+                'recepie' => $recepie,
+            ], 201);
         }
 
         return redirect()->route('meal');

@@ -25,6 +25,7 @@ class TrainerAuthController extends Controller
                 'unique:users,email',
                 'unique:restaurant_users,email',
                 'unique:trainer_users,email',
+                'unique:moderator_users,email',
             ],
             'password' => [
                 'required',
@@ -49,6 +50,7 @@ class TrainerAuthController extends Controller
         $user = TrainerUser::create([
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'moderation_status' => TrainerUser::MODERATION_PENDING,
         ]);
 
         // Auth::guard('trainer')->attempt($request->only('email', 'password'));
@@ -59,6 +61,8 @@ class TrainerAuthController extends Controller
             return response()->json([
                 'success' => true,
                 'token' => $token,
+                'moderation_status' => $user->moderation_status,
+                'message' => 'Registration successful. Account is pending moderation.',
                 'user' => [
                     'id' => $user->id,
                     'email' => $user->email,
@@ -96,6 +100,7 @@ class TrainerAuthController extends Controller
                 return response()->json([
                     'success' => true,
                     'token' => $token,
+                    'moderation_status' => $user->moderation_status,
                     'user' => [
                         'id' => $user->id,
                         'email' => $user->email,

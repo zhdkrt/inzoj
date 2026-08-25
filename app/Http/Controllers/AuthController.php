@@ -21,6 +21,8 @@ class AuthController extends Controller
                 'max:255',
                 'unique:users,email',
                 'unique:restaurant_users,email',
+                'unique:trainer_users,email',
+                'unique:moderator_users,email',
             ],
             'password' => [
                 'required',

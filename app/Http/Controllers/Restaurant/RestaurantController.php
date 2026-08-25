@@ -13,11 +13,11 @@ class RestaurantController extends Controller
 {
     public function show(Request $request) {
         $restaurantType = $request->get('restaurant_type');
+        $query = Restaurant::approved();
         if (!empty($restaurantType)) {
-            $correctRestaurants = Restaurant::where('restaurant_type', $restaurantType)->limit(16)->get();
-        } else {
-            $correctRestaurants = Restaurant::limit(16)->get();
+            $query->where('restaurant_type', $restaurantType);
         }
+        $correctRestaurants = $query->limit(16)->get();
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
@@ -32,7 +32,7 @@ class RestaurantController extends Controller
 
     public function restaurantMenu(Request $request) {
         $restaurantId = $request->get('restaurant_id');
-        $restaurant = Restaurant::find($restaurantId);
+        $restaurant = Restaurant::approved()->find($restaurantId);
 
         if (!$restaurant && $request->expectsJson()) {
             return response()->json([

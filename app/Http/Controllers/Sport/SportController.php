@@ -39,19 +39,19 @@ class SportController extends Controller
             ], 422);
         }        
 
-        if (in_array('all', $categoriesFilter) || empty($categoriesFilter)) {
-            $suitableTrainings = Training::whereBetween('date', [$fromDate, $toDate])
-                ->whereDoesntHave('userTraining')->orderBy('date', 'asc')->limit(16)->get();
-            $trainersId = Training::limit(16)->pluck('trainer_user_id')->toArray();
-        } else {
-            $suitableTrainings = Training::whereBetween('date', [$fromDate, $toDate])
-                ->whereDoesntHave('userTraining')->orderBy('date', 'asc')
-                ->whereIn('category_id', $categoriesFilter)->limit(16)->get();
-            $trainersId = Training::whereIn('category_id', $categoriesFilter)
-                ->limit(16)->pluck('trainer_user_id')->toArray();
+        $query = Training::whereBetween('date', [$fromDate, $toDate])
+            ->whereDoesntHave('userTraining')
+            ->whereHas('trainerUser', function ($trainerQuery) {
+                $trainerQuery->approved();
+            })
+            ->orderBy('date', 'asc');
+
+        if (!in_array('all', $categoriesFilter) && !empty($categoriesFilter)) {
+            $query->whereIn('category_id', $categoriesFilter);
         }
 
-        $uniqueTrainersId = array_unique($trainersId);
+        $suitableTrainings = $query->limit(16)->get();
+        $uniqueTrainersId = $suitableTrainings->pluck('trainer_user_id')->unique()->all();
         $trainers = [];
         foreach ($uniqueTrainersId as $id) {
             $trainer = TrainerUser::find($id);
@@ -96,6 +96,17 @@ class SportController extends Controller
                 ], 400);
             }
             return redirect()->back()->with('error', 'Вы уже записаны на эту тренировку');
+        }
+
+        $training = Training::with('trainerUser')->find($trainingId);
+        if (!$training || !$training->trainerUser || !$training->trainerUser->isApproved()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Training is not available'
+                ], 404);
+            }
+            return redirect()->back()->with('error', 'Тренировка недоступна');
         }
 
         UserTraining::create([
@@ -184,7 +195,7 @@ class SportController extends Controller
 
     public function trainer(Request $request) {
         $trainerId = $request->trainer_id;
-        $trainer = TrainerUser::find($trainerId);
+        $trainer = TrainerUser::approved()->find($trainerId);
 
         if (!$trainer) {
             if ($request->expectsJson()) {
@@ -213,7 +224,7 @@ class SportController extends Controller
 
     public function rating(Request $request) {
         $trainerId = $request->trainer_id;
-        $trainer = TrainerUser::find($trainerId);
+        $trainer = TrainerUser::approved()->find($trainerId);
 
         if (!$trainer) {
             if ($request->expectsJson()) {
