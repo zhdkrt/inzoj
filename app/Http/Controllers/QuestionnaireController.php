@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BodyLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -80,6 +81,10 @@ class QuestionnaireController extends Controller
         $validated = $request->validate($rules);
 
         $user->update($validated);
+
+        if (array_key_exists('current_weight', $validated)) {
+            BodyLog::record($user, BodyLog::TYPE_WEIGHT, $validated['current_weight']);
+        }
 
         // Определяем следующий шаг
         $steps = ['name', 'goal', 'weight', 'height', 'age', 'activity'];

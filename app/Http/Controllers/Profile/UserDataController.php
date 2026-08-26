@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
+use App\Models\BodyLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -140,6 +141,10 @@ class UserDataController extends Controller
         $validated = $request->validate($rules);
 
         $user->update([$field => $validated['value']]);
+
+        if ($field === 'current_weight') {
+            BodyLog::record($user, BodyLog::TYPE_WEIGHT, $validated['value']);
+        }
 
         if ($request->expectsJson()) {
             return response()->json([

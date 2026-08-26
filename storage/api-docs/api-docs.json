@@ -5223,6 +5223,416 @@
                 ]
             }
         },
+        "/api/stats/summary": {
+            "get": {
+                "tags": [
+                    "Stats"
+                ],
+                "summary": "Progress summary",
+                "operationId": "statsSummary",
+                "responses": {
+                    "200": {
+                        "description": "Start vs current weight, today calories; photos if premium"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/stats/series": {
+            "get": {
+                "tags": [
+                    "Stats"
+                ],
+                "summary": "Chart series",
+                "description": "Free metrics: weight, calories, burned_calories, proteins, fats, carbs, water, steps. Premium: neck, chest, waist, hips, biceps, glucose, blood_pressure_sys, blood_pressure_dia.",
+                "operationId": "statsSeries",
+                "parameters": [
+                    {
+                        "name": "metric",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "calories"
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-06-01"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-08-25"
+                        }
+                    },
+                    {
+                        "name": "group",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "default": "day",
+                            "enum": [
+                                "day",
+                                "week"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Points for charts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "metric": {
+                                            "type": "string",
+                                            "example": "calories"
+                                        },
+                                        "points": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "date": {
+                                                        "type": "string",
+                                                        "example": "2026-08-24"
+                                                    },
+                                                    "value": {
+                                                        "type": "number",
+                                                        "example": 1800
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Premium required for this metric"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/stats/compare": {
+            "get": {
+                "tags": [
+                    "Stats"
+                ],
+                "summary": "Before vs after",
+                "description": "Weight is always returned. Photos are included only for premium users.",
+                "operationId": "statsCompare",
+                "responses": {
+                    "200": {
+                        "description": "Start and current weight, optional photos"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/stats/logs": {
+            "get": {
+                "tags": [
+                    "Stats"
+                ],
+                "summary": "List body logs",
+                "operationId": "statsLogs",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "example": "weight"
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Log list"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Stats"
+                ],
+                "summary": "Create or update a log for a date",
+                "description": "One value per type per day (upsert). Weight is free. Measurements, glucose and blood pressure require premium.",
+                "operationId": "statsStoreLog",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "type",
+                                    "value"
+                                ],
+                                "properties": {
+                                    "type": {
+                                        "description": "weight, neck, chest, waist, hips, biceps, glucose, blood_pressure_sys, blood_pressure_dia",
+                                        "type": "string",
+                                        "example": "weight"
+                                    },
+                                    "value": {
+                                        "type": "number",
+                                        "example": 75.5
+                                    },
+                                    "logged_at": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-08-25"
+                                    },
+                                    "note": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Saved"
+                    },
+                    "403": {
+                        "description": "Premium required"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/stats/logs/{id}": {
+            "delete": {
+                "tags": [
+                    "Stats"
+                ],
+                "summary": "Delete a log",
+                "operationId": "statsDeleteLog",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/stats/photos": {
+            "get": {
+                "tags": [
+                    "Stats"
+                ],
+                "summary": "List progress photos",
+                "operationId": "statsPhotos",
+                "responses": {
+                    "200": {
+                        "description": "Photos"
+                    },
+                    "403": {
+                        "description": "Premium required"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Stats"
+                ],
+                "summary": "Upload a progress photo",
+                "operationId": "statsStorePhoto",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "photo"
+                                ],
+                                "properties": {
+                                    "photo": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "kind": {
+                                        "type": "string",
+                                        "enum": [
+                                            "before",
+                                            "after",
+                                            "progress"
+                                        ]
+                                    },
+                                    "taken_at": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "weight": {
+                                        "type": "number",
+                                        "example": 75.5
+                                    },
+                                    "note": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Saved"
+                    },
+                    "403": {
+                        "description": "Premium required"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/stats/photos/{id}/file": {
+            "get": {
+                "tags": [
+                    "Stats"
+                ],
+                "summary": "Download own progress photo",
+                "description": "Private file. Requires user Bearer token and premium. Frontend should fetch with Authorization, not a public img src.",
+                "operationId": "statsShowPhotoFile",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image file"
+                    },
+                    "403": {
+                        "description": "Premium required"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/stats/photos/{id}": {
+            "delete": {
+                "tags": [
+                    "Stats"
+                ],
+                "summary": "Delete a progress photo",
+                "operationId": "statsDeletePhoto",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            }
+        },
         "/api/profile/targets": {
             "get": {
                 "tags": [
@@ -8465,6 +8875,74 @@
                     }
                 },
                 "type": "object"
+            },
+            "BodyLog": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "type": {
+                        "type": "string",
+                        "example": "weight"
+                    },
+                    "value": {
+                        "type": "number",
+                        "example": 75.5
+                    },
+                    "unit": {
+                        "type": "string",
+                        "example": "kg"
+                    },
+                    "logged_at": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-08-25"
+                    },
+                    "note": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ProgressPhoto": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "before",
+                            "after",
+                            "progress"
+                        ]
+                    },
+                    "taken_at": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "weight_at_time": {
+                        "type": "number",
+                        "example": 75.5,
+                        "nullable": true
+                    },
+                    "note": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "/api/stats/photos/1/file"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -8554,6 +9032,10 @@
         {
             "name": "Sport",
             "description": "Sport trainings management"
+        },
+        {
+            "name": "Stats",
+            "description": "Progress statistics: weight and calories are free; measurements and photos require premium"
         },
         {
             "name": "Targets",

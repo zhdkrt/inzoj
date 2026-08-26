@@ -6,6 +6,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\QuestionnaireController;
 use App\Http\Controllers\PremiumController;
 
+use App\Http\Controllers\StatsController;
+
 use App\Http\Controllers\Profile\UserDataController;
 use App\Http\Controllers\Profile\TargetsController;
 use App\Http\Controllers\Profile\RationController;
@@ -133,6 +135,19 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // Вода
         Route::put('/water', [WaterController::class, 'waterCounter']);
+    });
+
+    Route::prefix('stats')->group(function () {
+        Route::get('/summary', [StatsController::class, 'summary']);
+        Route::get('/series', [StatsController::class, 'series']);
+        Route::get('/compare', [StatsController::class, 'compare']);
+        Route::get('/logs', [StatsController::class, 'logs']);
+        Route::post('/logs', [StatsController::class, 'storeLog']);
+        Route::delete('/logs/{id}', [StatsController::class, 'deleteLog']);
+        Route::get('/photos', [StatsController::class, 'photos']);
+        Route::post('/photos', [StatsController::class, 'storePhoto']);
+        Route::get('/photos/{id}/file', [StatsController::class, 'showFile']);
+        Route::delete('/photos/{id}', [StatsController::class, 'deletePhoto']);
     });
     
     // ==================== Премиум маршруты ====================

@@ -38,5 +38,23 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'premium_until' => 'datetime',
     ];
+
+    public function isPremiumActive(): bool
+    {
+        return (bool) $this->is_premium
+            && $this->premium_until
+            && $this->premium_until->isFuture();
+    }
+
+    public function bodyLogs()
+    {
+        return $this->hasMany(BodyLog::class);
+    }
+
+    public function progressPhotos()
+    {
+        return $this->hasMany(ProgressPhoto::class);
+    }
 }
