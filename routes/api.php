@@ -34,6 +34,7 @@ use App\Http\Controllers\TrainerUser\TrainerTrainingController;
 
 use App\Http\Controllers\Moderator\ModeratorAuthController;
 use App\Http\Controllers\Moderator\ModerationController;
+use App\Http\Controllers\Moderator\ActivityCatalogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -128,8 +129,10 @@ Route::middleware('auth:sanctum')->group(function () {
             // Тренировки
             Route::prefix('training')->group(function () {
                 Route::get('/', [TrainingController::class, 'show']);
+                Route::post('/create', [TrainingController::class, 'createActivity']);
                 Route::post('/add', [TrainingController::class, 'addTraining']);
                 Route::put('/update', [TrainingController::class, 'updateTraining']);
+                Route::delete('/{id}', [TrainingController::class, 'deleteTraining']);
             });
         });
         
@@ -224,6 +227,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/trainers', [ModerationController::class, 'trainers']);
         Route::get('/trainers/{id}', [ModerationController::class, 'showTrainer']);
         Route::post('/trainers/{id}', [ModerationController::class, 'reviewTrainer']);
+
+        Route::get('/activities', [ActivityCatalogController::class, 'index']);
+        Route::post('/activities', [ActivityCatalogController::class, 'store']);
+        Route::post('/activities/import', [ActivityCatalogController::class, 'import']);
+        Route::put('/activities/{id}', [ActivityCatalogController::class, 'update']);
     });
 });
 

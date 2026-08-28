@@ -17,4 +17,9 @@ class UserActivity extends Model
         'time_type',
         'calories'
     ];
+
+    public function activity()
+    {
+        return $this->belongsTo(Activity::class);
+    }
 }

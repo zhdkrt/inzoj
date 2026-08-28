@@ -144,10 +144,10 @@ class DiaryNoteController extends Controller
         if ($allUserActivities != []) {
             foreach ($allUserActivities as $userActivity) {
                 $training = Activity::find($userActivity->activity_id);
-                $trainingName = $training->name;
                 $userActivityData[] = [
-                    'name' => $trainingName,
-                    'activity' => $userActivity
+                    'name' => $training?->name,
+                    'activity' => $userActivity,
+                    'catalog' => $training ? $training->toApiArray($user) : null,
                 ];
             }
         }

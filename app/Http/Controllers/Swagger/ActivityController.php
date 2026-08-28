@@ -33,6 +33,38 @@ use Illuminate\Http\Request;
  *         ),
  *         description="Type of activity"
  *     ),
+ *     @OA\Parameter(
+ *         name="q",
+ *         in="query",
+ *         required=false,
+ *         @OA\Schema(type="string", example="Отжимания"),
+ *         description="Search by exercise name (training only)"
+ *     ),
+ *     @OA\Parameter(
+ *         name="location_type",
+ *         in="query",
+ *         required=false,
+ *         @OA\Schema(type="string", enum={"home", "gym", "outdoor", "any"}),
+ *         description="Filter by place. home/gym/outdoor also include activities with location any"
+ *     ),
+ *     @OA\Parameter(
+ *         name="category",
+ *         in="query",
+ *         required=false,
+ *         @OA\Schema(type="string", example="abs")
+ *     ),
+ *     @OA\Parameter(
+ *         name="page",
+ *         in="query",
+ *         required=false,
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\Parameter(
+ *         name="per_page",
+ *         in="query",
+ *         required=false,
+ *         @OA\Schema(type="integer", example=20)
+ *     ),
  *     
  *     @OA\Response(
  *         response=200,
@@ -48,6 +80,15 @@ use Illuminate\Http\Request;
  *                 nullable=true,
  *                 @OA\Items(ref="#/components/schemas/Activity")
  *             ),
+ *             @OA\Property(
+ *                 property="meta",
+ *                 type="object",
+ *                 nullable=true,
+ *                 @OA\Property(property="current_page", type="integer", example=1),
+ *                 @OA\Property(property="last_page", type="integer", example=2),
+ *                 @OA\Property(property="per_page", type="integer", example=20),
+ *                 @OA\Property(property="total", type="integer", example=21)
+ *             )
  *         )
  *     ),
  *     

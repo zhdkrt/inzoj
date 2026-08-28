@@ -24,6 +24,269 @@
         }
     ],
     "paths": {
+        "/api/moderator/activities": {
+            "get": {
+                "tags": [
+                    "Moderator - Activities"
+                ],
+                "summary": "List global catalog",
+                "operationId": "moderatorActivities",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "location_type",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "home",
+                                "gym",
+                                "outdoor",
+                                "any"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Catalog list"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Moderator - Activities"
+                ],
+                "summary": "Create or update one catalog exercise by name",
+                "operationId": "moderatorStoreActivity",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Отжимания"
+                                    },
+                                    "time": {
+                                        "type": "string",
+                                        "example": "10 мин"
+                                    },
+                                    "calories": {
+                                        "type": "integer",
+                                        "example": 80
+                                    },
+                                    "location_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "home",
+                                            "gym",
+                                            "outdoor",
+                                            "any"
+                                        ],
+                                        "example": "home"
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "chest"
+                                    },
+                                    "video_url": {
+                                        "type": "string",
+                                        "example": "https://example.com/pushups.mp4",
+                                        "nullable": true
+                                    },
+                                    "is_premium": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "200": {
+                        "description": "Updated existing name"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/moderator/activities/import": {
+            "post": {
+                "tags": [
+                    "Moderator - Activities"
+                ],
+                "summary": "Bulk import catalog",
+                "description": "Upsert global exercises by name. Use this when the video course database is delivered.",
+                "operationId": "moderatorImportActivities",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "activities"
+                                ],
+                                "properties": {
+                                    "activities": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "name"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "time": {
+                                                    "type": "string"
+                                                },
+                                                "calories": {
+                                                    "type": "integer"
+                                                },
+                                                "location_type": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "home",
+                                                        "gym",
+                                                        "outdoor",
+                                                        "any"
+                                                    ]
+                                                },
+                                                "category": {
+                                                    "type": "string"
+                                                },
+                                                "video_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "is_premium": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "created/updated counts"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/moderator/activities/{id}": {
+            "put": {
+                "tags": [
+                    "Moderator - Activities"
+                ],
+                "summary": "Update a catalog exercise",
+                "operationId": "moderatorUpdateActivity",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "time": {
+                                        "type": "string"
+                                    },
+                                    "calories": {
+                                        "type": "integer"
+                                    },
+                                    "location_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "home",
+                                            "gym",
+                                            "outdoor",
+                                            "any"
+                                        ]
+                                    },
+                                    "category": {
+                                        "type": "string"
+                                    },
+                                    "video_url": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "is_premium": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "moderatorSanctumToken": []
+                    }
+                ]
+            }
+        },
         "/api/diary/activity": {
             "get": {
                 "tags": [
@@ -56,6 +319,58 @@
                                 "training"
                             ]
                         }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search by exercise name (training only)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Отжимания"
+                        }
+                    },
+                    {
+                        "name": "location_type",
+                        "in": "query",
+                        "description": "Filter by place. home/gym/outdoor also include activities with location any",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "home",
+                                "gym",
+                                "outdoor",
+                                "any"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "abs"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 20
+                        }
                     }
                 ],
                 "responses": {
@@ -85,6 +400,28 @@
                                             "items": {
                                                 "$ref": "#/components/schemas/Activity"
                                             },
+                                            "nullable": true
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 21
+                                                }
+                                            },
+                                            "type": "object",
                                             "nullable": true
                                         }
                                     },
@@ -7606,6 +7943,105 @@
                 ]
             }
         },
+        "/api/diary/activity/training/create": {
+            "post": {
+                "tags": [
+                    "Diary - Trainings"
+                ],
+                "summary": "Create a custom exercise",
+                "description": "Adds a personal catalog item visible only to the current user. Then add it to the diary via POST /api/diary/activity/training/add.",
+                "operationId": "createCustomActivity",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Мои отжимания"
+                                    },
+                                    "time": {
+                                        "type": "string",
+                                        "example": "10 мин"
+                                    },
+                                    "calories": {
+                                        "type": "integer",
+                                        "example": 70
+                                    },
+                                    "location_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "home",
+                                            "gym",
+                                            "outdoor",
+                                            "any"
+                                        ]
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "chest"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/diary/activity/training/{id}": {
+            "delete": {
+                "tags": [
+                    "Diary - Trainings"
+                ],
+                "summary": "Delete a diary workout",
+                "description": "id is user_activity_id from GET /api/diary",
+                "operationId": "deleteDiaryTraining",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            }
+        },
         "/api/profile/user-data": {
             "get": {
                 "tags": [
@@ -8862,12 +9298,52 @@
                     },
                     "name": {
                         "type": "string",
-                        "example": "Running"
+                        "example": "Отжимания"
+                    },
+                    "time": {
+                        "type": "string",
+                        "example": "10 мин"
                     },
                     "calories": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 300
+                        "type": "integer",
+                        "example": 80
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "chest",
+                        "nullable": true
+                    },
+                    "location_type": {
+                        "type": "string",
+                        "enum": [
+                            "home",
+                            "gym",
+                            "outdoor",
+                            "any"
+                        ],
+                        "example": "home"
+                    },
+                    "is_custom": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "is_premium": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "has_video": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "video_url": {
+                        "type": "string",
+                        "example": "https://example.com/video.mp4",
+                        "nullable": true
+                    },
+                    "video_locked": {
+                        "description": "True when a video exists but the user is not premium",
+                        "type": "boolean",
+                        "example": false
                     },
                     "is_favorite": {
                         "type": "boolean",
@@ -8973,6 +9449,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Moderator - Activities",
+            "description": "Import and edit the global exercise catalog, including video URLs for the paid Activity tab"
+        },
         {
             "name": "Authentication",
             "description": "API authentication endpoints"

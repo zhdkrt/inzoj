@@ -21,4 +21,24 @@ class DiaryNote extends Model
         'current_steps',
     ];
 
+    public static function caloriesFromSteps($steps): float
+    {
+        return round(((int) $steps) * 50 / 1000, 1);
+    }
+
+    public function recountBurnedCalories(): float
+    {
+        $fromSteps = self::caloriesFromSteps($this->current_steps);
+        $fromWorkouts = (float) UserActivity::where('diary_note_id', $this->id)->sum('calories');
+        $total = round($fromSteps + $fromWorkouts, 1);
+
+        $this->update(['burned_calories' => $total]);
+
+        return $total;
+    }
+
+    public function userActivities()
+    {
+        return $this->hasMany(UserActivity::class);
+    }
 }

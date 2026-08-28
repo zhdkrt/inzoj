@@ -286,8 +286,16 @@ use Illuminate\Http\Request;
  *     type="object",
  *     title="Activity",
  *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="name", type="string", example="Running"),
- *     @OA\Property(property="calories", type="number", format="float", example=300),
+ *     @OA\Property(property="name", type="string", example="Отжимания"),
+ *     @OA\Property(property="time", type="string", example="10 мин"),
+ *     @OA\Property(property="calories", type="integer", example=80),
+ *     @OA\Property(property="category", type="string", nullable=true, example="chest"),
+ *     @OA\Property(property="location_type", type="string", enum={"home", "gym", "outdoor", "any"}, example="home"),
+ *     @OA\Property(property="is_custom", type="boolean", example=false),
+ *     @OA\Property(property="is_premium", type="boolean", example=false),
+ *     @OA\Property(property="has_video", type="boolean", example=true),
+ *     @OA\Property(property="video_url", type="string", nullable=true, example="https://example.com/video.mp4"),
+ *     @OA\Property(property="video_locked", type="boolean", example=false, description="True when a video exists but the user is not premium"),
  *     @OA\Property(property="is_favorite", type="boolean", example=false)
  * )
  */

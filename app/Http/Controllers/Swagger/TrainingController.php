@@ -214,7 +214,45 @@ use Illuminate\Http\Request;
  *     
  *     @OA\Response(response=401, description="Unauthenticated")
  * )
- * 
+ *
+ * @OA\Post(
+ *     path="/api/diary/activity/training/create",
+ *     summary="Create a custom exercise",
+ *     description="Adds a personal catalog item visible only to the current user. Then add it to the diary via POST /api/diary/activity/training/add.",
+ *     operationId="createCustomActivity",
+ *     tags={"Diary - Trainings"},
+ *     security={{"userSanctumToken": {}}},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="application/json",
+ *             @OA\Schema(
+ *                 required={"name"},
+ *                 @OA\Property(property="name", type="string", example="Мои отжимания"),
+ *                 @OA\Property(property="time", type="string", example="10 мин"),
+ *                 @OA\Property(property="calories", type="integer", example=70),
+ *                 @OA\Property(property="location_type", type="string", enum={"home", "gym", "outdoor", "any"}),
+ *                 @OA\Property(property="category", type="string", example="chest")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(response=201, description="Created"),
+ *     @OA\Response(response=401, description="Unauthenticated")
+ * )
+ *
+ * @OA\Delete(
+ *     path="/api/diary/activity/training/{id}",
+ *     summary="Delete a diary workout",
+ *     description="id is user_activity_id from GET /api/diary",
+ *     operationId="deleteDiaryTraining",
+ *     tags={"Diary - Trainings"},
+ *     security={{"userSanctumToken": {}}},
+ *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\Response(response=200, description="Deleted"),
+ *     @OA\Response(response=404, description="Not found"),
+ *     @OA\Response(response=401, description="Unauthenticated")
+ * )
+ *
  */
 
 class TrainingController extends Controller
