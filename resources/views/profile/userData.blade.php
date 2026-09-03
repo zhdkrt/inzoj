@@ -31,9 +31,9 @@
         @endforeach
 
         <div class="flex flex-col gap-1">
-            <p>Индекс массы тела: {{ $calculated_data['imt'] }} ({{ $calculated_data['imt_classification'] }})</p>
-            <p>Базовый метаболизм: {{ $calculated_data['bmr'] }} ккал</p>
-            <p>Суточная норма калорий: {{ $calculated_data['calories_norm'] }} ккал</p>
+            <p>Индекс массы тела: {{ $calculated_data['imt'] ?? '—' }} ({{ $calculated_data['imt_classification'] ?? 'недостаточно данных' }})</p>
+            <p>Базовый метаболизм: {{ $calculated_data['bmr'] ?? '—' }} ккал</p>
+            <p>Суточная норма калорий: {{ $calculated_data['calories_norm'] ?? '—' }} ккал</p>
         </div>
         
         <form method="GET" action="{{ route('profile') }}">

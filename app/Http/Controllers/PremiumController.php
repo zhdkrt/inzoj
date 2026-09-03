@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\NutritionCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -50,6 +51,7 @@ class PremiumController extends Controller
                 'is_premium' => true,
                 'premium_until' => $premiumUntil
             ]);
+            NutritionCalculator::applyToUser($user->fresh());
 
             if ($request->expectsJson()) {
                 return response()->json([

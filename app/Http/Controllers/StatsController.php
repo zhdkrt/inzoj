@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BodyLog;
 use App\Models\DiaryNote;
 use App\Models\ProgressPhoto;
+use App\Services\NutritionCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -186,6 +187,10 @@ class StatsController extends Controller
                 ->orderByDesc('logged_at')
                 ->first();
             $user->update(['current_weight' => $latest ? (int) round($latest->value) : null]);
+        }
+
+        if (in_array($type, [BodyLog::TYPE_WEIGHT, 'waist', 'hips', 'neck', 'chest'], true)) {
+            NutritionCalculator::applyToUser($user->fresh());
         }
 
         return response()->json([

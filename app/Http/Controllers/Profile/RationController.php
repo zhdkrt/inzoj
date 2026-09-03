@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\FoodRecommendations;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -92,6 +93,7 @@ class RationController extends Controller
                 'all_allergies' => $this->getAllAllergies(),
                 'food_preferences' => $user->food_preferences,
                 'userAllergies' => $this->getAllergiesArray($user->allergies),
+                'product_recommendations' => FoodRecommendations::forUser($user->food_preferences, $user->allergies),
             ]);
         }
 
@@ -131,11 +133,14 @@ class RationController extends Controller
             'food_preferences' => $new_food_preferences
         ]);
 
+        $user = $user->fresh();
+
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Данные обновлены',
-                '_csrf_token' => csrf_token()
+                '_csrf_token' => csrf_token(),
+                'product_recommendations' => FoodRecommendations::forUser($user->food_preferences, $user->allergies),
             ]);
         }
 

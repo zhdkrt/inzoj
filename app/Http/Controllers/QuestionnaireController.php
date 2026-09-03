@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BodyLog;
-use App\Models\User;
+use App\Services\NutritionCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,10 +16,11 @@ class QuestionnaireController extends Controller
         
         $stepFieldMap = [
             'name' => 'name',
-            'goal' => 'goal', 
+            'goal' => 'goal',
             'weight' => 'current_weight',
             'height' => 'height',
             'age' => 'age',
+            'gender' => 'gender',
             'activity' => 'activity_level'
         ];
 
@@ -40,6 +41,7 @@ class QuestionnaireController extends Controller
             'target_weight' => $user->target_weight,
             'height' => $user->height,
             'age' => $user->age,
+            'gender' => $user->gender,
             'activity_level' => $user->activity_level,
         ];
 
@@ -74,6 +76,8 @@ class QuestionnaireController extends Controller
             $rules['height'] = 'required|integer|min:100|max:220';
         } elseif ($currentStep === 'age') {
             $rules['age'] = 'required|integer|min:18|max:100';
+        } elseif ($currentStep === 'gender') {
+            $rules['gender'] = 'required|in:male,female';
         } elseif ($currentStep === 'activity') {
             $rules['activity_level'] = 'required|in:low,medium,high,expert';
         }
@@ -87,7 +91,7 @@ class QuestionnaireController extends Controller
         }
 
         // Определяем следующий шаг
-        $steps = ['name', 'goal', 'weight', 'height', 'age', 'activity'];
+        $steps = ['name', 'goal', 'weight', 'height', 'age', 'gender', 'activity'];
         $currentIndex = array_search($currentStep, $steps);
 
         if ($action === 'prev' && $currentIndex > 0) {
@@ -98,9 +102,14 @@ class QuestionnaireController extends Controller
             $nextStep = $currentStep;
         }
 
+        $user = $user->fresh();
+        if (NutritionCalculator::canCalculate($user)) {
+            $user = NutritionCalculator::applyToUser($user);
+        }
+
+        $isComplete = ($action === 'next' && $currentStep === 'activity');
+
         if ($request->expectsJson()) {
-            $isComplete = ($action === 'next' && $currentStep === 'activity');
-            
             return response()->json([
                 'success' => true,
                 'message' => 'Step completed successfully',
@@ -111,7 +120,7 @@ class QuestionnaireController extends Controller
             ]);
         }
 
-        if ($action === 'next' && $currentStep === 'activity') {
+        if ($isComplete) {
             return redirect()->route('diary');
         }
 

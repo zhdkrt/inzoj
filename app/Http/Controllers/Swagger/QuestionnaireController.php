@@ -23,7 +23,7 @@ use Illuminate\Http\Request;
  *         name="step",
  *         in="query",
  *         required=false,
- *         @OA\Schema(type="string", enum={"name", "goal", "weight", "height", "age", "activity"}),
+ *         @OA\Schema(type="string", enum={"name", "goal", "weight", "height", "age", "gender", "activity"}),
  *         description="Specific step to display"
  *     ),
  *     
@@ -33,7 +33,7 @@ use Illuminate\Http\Request;
  *         @OA\JsonContent(
  *             type="object",
  *             @OA\Property(property="success", type="boolean", example=true),
- *             @OA\Property(property="step", type="string", enum={"name", "goal", "weight", "height", "age", "activity"}, example="name"),
+ *             @OA\Property(property="step", type="string", enum={"name", "goal", "weight", "height", "age", "gender", "activity"}, example="name"),
  *             @OA\Property(
  *                 property="data",
  *                 type="object",
@@ -43,13 +43,14 @@ use Illuminate\Http\Request;
  *                 @OA\Property(property="target_weight", type="number", format="float", nullable=true),
  *                 @OA\Property(property="height", type="integer", nullable=true),
  *                 @OA\Property(property="age", type="integer", nullable=true),
+ *                 @OA\Property(property="gender", type="string", enum={"male", "female"}, nullable=true),
  *                 @OA\Property(property="activity_level", type="string", enum={"low", "medium", "high", "expert"}, nullable=true)
  *             ),
  *             @OA\Property(
  *                 property="steps",
  *                 type="array",
  *                 @OA\Items(type="string"),
- *                 example={"name", "goal", "weight", "height", "age", "activity"}
+ *                 example={"name", "goal", "weight", "height", "age", "gender", "activity"}
  *             )
  *         )
  *     ),
@@ -61,7 +62,7 @@ use Illuminate\Http\Request;
  * @OA\Put(
  *     path="/api/questionnaire/update",
  *     summary="Update questionnaire step",
- *     description="Saves data for current step and returns next step",
+     *     description="Saves data for current step and returns next step. Completing activity writes Mifflin/extended nutrition targets (calories, KBJU, water, steps).",
  *     operationId="updateQuestionnaire",
  *     tags={"Questionnaire"},
  *     security={{"userSanctumToken": {}}},
@@ -70,7 +71,7 @@ use Illuminate\Http\Request;
  *         name="step",
  *         in="query",
  *         required=false,
- *         @OA\Schema(type="string", enum={"name", "goal", "weight", "height", "age", "activity"}),
+ *         @OA\Schema(type="string", enum={"name", "goal", "weight", "height", "age", "gender", "activity"}),
  *         description="Current step (default: name)"
  *     ),
  *     
@@ -108,6 +109,10 @@ use Illuminate\Http\Request;
  *                     @OA\Schema(
  *                         required={"age"},
  *                         @OA\Property(property="age", type="integer", example=30)
+ *                     ),
+ *                     @OA\Schema(
+ *                         required={"gender"},
+ *                         @OA\Property(property="gender", type="string", enum={"male", "female"}, example="female")
  *                     ),
  *                     @OA\Schema(
  *                         required={"activity_level"},

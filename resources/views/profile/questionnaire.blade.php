@@ -75,7 +75,19 @@
         </div>
         @endif
 
-        <!-- Шаг 6: Активность -->
+        <!-- Шаг 6: Пол -->
+        @if($step === 'gender')
+        <div class="space-y-4">
+            <h3 class="font-medium">Ваш пол</h3>
+            <select name="gender" required class="w-full rounded px-3 py-2">
+                <option value="">Выберите пол</option>
+                <option value="male" {{ (old('gender', $data['gender'] ?? '') == 'male') ? 'selected' : '' }}>Мужской</option>
+                <option value="female" {{ (old('gender', $data['gender'] ?? '') == 'female') ? 'selected' : '' }}>Женский</option>
+            </select>
+        </div>
+        @endif
+
+        <!-- Шаг 7: Активность -->
         @if($step === 'activity')
         <div class="space-y-4">
             <h3 class="font-medium">Уровень активности</h3>

@@ -11,6 +11,7 @@ use App\Http\Controllers\StatsController;
 use App\Http\Controllers\Profile\UserDataController;
 use App\Http\Controllers\Profile\TargetsController;
 use App\Http\Controllers\Profile\RationController;
+use App\Http\Controllers\Profile\NutritionController;
 
 use App\Http\Controllers\Diary\DiaryNoteController;
 use App\Http\Controllers\Diary\MealController;
@@ -88,6 +89,9 @@ Route::middleware('auth:sanctum')->group(function () {
         
         Route::get('/ration', [RationController::class, 'show']);
         Route::patch('/ration/update', [RationController::class, 'update']);
+
+        Route::get('/nutrition', [NutritionController::class, 'show']);
+        Route::post('/nutrition/recalculate', [NutritionController::class, 'recalculate']);
     });
     
     // Дневник

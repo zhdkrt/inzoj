@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\NutritionCalculator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -96,6 +97,10 @@ class BodyLog extends Model
 
         if ($type === self::TYPE_WEIGHT) {
             $user->update(['current_weight' => (int) round((float) $value)]);
+        }
+
+        if (in_array($type, [self::TYPE_WEIGHT, 'waist', 'hips', 'neck', 'chest'], true)) {
+            NutritionCalculator::applyToUser($user->fresh());
         }
 
         return $log;

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
 use App\Models\BodyLog;
-use App\Models\User;
+use App\Services\NutritionCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,49 +20,17 @@ class UserDataController extends Controller
     public function show(Request $request)
     {
         $user = Auth::user();
+        $plan = NutritionCalculator::build($user);
+        $calculated_data = $this->legacyCalculatedData($plan);
 
-        $calculate_bmr = 10 * $user->current_weight + 6.25 * $user->height - 5 * $user->age;
-        $bmr = round($user->gender == 'male' ? $calculate_bmr + 5 : $calculate_bmr - 161, 0);
-
-        $height_in_meters = $user->height / 100;
-        $imt = round($user->current_weight / (pow($height_in_meters, 2)), 1);
-        switch($imt) {
-            case $imt < 18.5:
-                $imt_classification = 'дефицит массы тела';
-                break;
-            case $imt >= 18.5 && $imt <= 24.9:
-                $imt_classification = 'норма';
-                break;
-            case $imt >= 25 && $imt <= 29.9:
-                $imt_classification = 'избыточная масса';
-                break;
-            case $imt >= 30:
-                $imt_classification = 'ожирение';
-                break;
-        }
-
-        $activity_level_coefficient = [
-            'low' => 1.2,
-            'medium' => 1.55,
-            'high' => 1.725,
-            'expert' => 1.9,
-        ];
-        $calories_norm = round($bmr * $activity_level_coefficient[$user->activity_level], 0);
-
-        $calculated_data = [
-            'bmr' => $bmr,
-            'imt' => $imt,
-            'imt_classification' => $imt_classification,
-            'calories_norm' => $calories_norm
-        ];
-        
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
                 'user' => $user,
                 'fields' => $this->fields,
                 'editing' => false,
-                'calculated_data' => $calculated_data
+                'calculated_data' => $calculated_data,
+                'plan' => $plan,
             ]);
         }
         return view('profile.userData', [
@@ -80,12 +48,11 @@ class UserDataController extends Controller
 
         if (!array_key_exists($field, $this->fields)) {
             if ($request->expectsJson()) {
-            if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Non-existent field'
                 ], 400);
-            }        }
+            }
             return redirect()->route('userData');
         }
 
@@ -118,12 +85,12 @@ class UserDataController extends Controller
                     'success' => false,
                     'message' => 'Non-existent field'
                 ], 400);
-            }        
+            }
             return redirect()->route('userData');
         }
 
         $rules = [];
-        
+
         switch ($field) {
             case 'current_weight':
                 $rules['value'] = 'required|numeric|min:30|max:300';
@@ -146,6 +113,8 @@ class UserDataController extends Controller
             BodyLog::record($user, BodyLog::TYPE_WEIGHT, $validated['value']);
         }
 
+        NutritionCalculator::applyToUser($user->fresh());
+
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
@@ -153,7 +122,17 @@ class UserDataController extends Controller
                 '_csrf_token' => csrf_token()
             ]);
         }
-        
+
         return redirect()->route('userData');
+    }
+
+    private function legacyCalculatedData(array $plan): array
+    {
+        return [
+            'bmr' => $plan['calculator']['free']['bmr'] ?? null,
+            'imt' => $plan['bmi']['value'] ?? null,
+            'imt_classification' => $plan['bmi']['classification'] ?? null,
+            'calories_norm' => $plan['limits']['daily']['calories'] ?? null,
+        ];
     }
 }

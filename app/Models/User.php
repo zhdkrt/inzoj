@@ -24,6 +24,9 @@ class User extends Authenticatable
         'gender',
         'activity_level',
         'calories',
+        'proteins',
+        'fats',
+        'carbs',
         'water',
         'steps',
         'food_preferences',
@@ -39,6 +42,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'premium_until' => 'datetime',
+        'proteins' => 'float',
+        'fats' => 'float',
+        'carbs' => 'float',
+        'water' => 'float',
     ];
 
     public function isPremiumActive(): bool

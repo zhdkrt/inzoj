@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Profile;
 use App\Http\Controllers\Controller;
 use App\Models\BodyLog;
 use App\Models\User;
+use App\Services\NutritionCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,6 +18,9 @@ class TargetsController extends Controller
         'target_weight' => 'Желаемый вес',
         'activity_level' => 'Уровень активности',
         'calories' => 'Цель по калориям',
+        'proteins' => 'Белки, г',
+        'fats' => 'Жиры, г',
+        'carbs' => 'Углеводы, г',
         'water' => 'Цель по воде',
         'steps' => 'Шаги(цель)'
     ];
@@ -32,6 +36,7 @@ class TargetsController extends Controller
                 'user' => $user,
                 'fields' => $this->fields,
                 'editing' => false,
+                'plan' => NutritionCalculator::build($user),
             ]);
         }
 
@@ -109,6 +114,11 @@ class TargetsController extends Controller
             case 'calories':
                 $rules['value'] = 'required|integer|min:1000|max:5000';
                 break;
+            case 'proteins':
+            case 'fats':
+            case 'carbs':
+                $rules['value'] = 'required|numeric|min:0|max:500';
+                break;
             case 'water':
                 $rules['value'] = 'required|decimal:1,1|min:1.0|max:3.0';
                 break;
@@ -122,6 +132,10 @@ class TargetsController extends Controller
 
         if ($field === 'current_weight') {
             BodyLog::record($user, BodyLog::TYPE_WEIGHT, $validated['value']);
+        }
+
+        if (in_array($field, ['goal', 'current_weight', 'activity_level'], true)) {
+            NutritionCalculator::applyToUser($user->fresh());
         }
 
         if ($request->expectsJson()) {

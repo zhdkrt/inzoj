@@ -47,6 +47,17 @@ use Illuminate\Http\Request;
  *                 type="array",
  *                 description="List of user's allergies",
  *                 @OA\Items(type="string", example="lactose")
+ *             ),
+ *             @OA\Property(
+ *                 property="product_recommendations",
+ *                 type="array",
+ *                 description="Foods filtered by diet and allergies",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="name", type="string"),
+ *                     @OA\Property(property="group", type="string"),
+ *                     @OA\Property(property="role", type="string")
+ *                 )
  *             )
  *         )
  *     ),
@@ -103,6 +114,7 @@ use Illuminate\Http\Request;
  *             type="object",
  *             @OA\Property(property="success", type="boolean", example=true),
  *             @OA\Property(property="message", type="string", example="Данные обновлены"),
+ *             @OA\Property(property="product_recommendations", type="array", @OA\Items(type="object"))
  *         )
  *     ),
  *     

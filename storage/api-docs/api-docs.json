@@ -2509,6 +2509,203 @@
                 ]
             }
         },
+        "/api/profile/nutrition": {
+            "get": {
+                "tags": [
+                    "Nutrition"
+                ],
+                "summary": "Nutrition plan and BMI",
+                "description": "Returns stored daily limits and a calculated plan: Mifflin-St Jeor (free) or Mifflin+Harris-Benedict blend (premium), daily and weekly KBJU/water/steps, 7-day regime with product recommendations filtered by diet and allergies, and BMI with Broca, Lorentz, waist/hip/neck/chest when logs exist.",
+                "operationId": "getNutritionPlan",
+                "responses": {
+                    "200": {
+                        "description": "Plan. If profile is incomplete, plan.ready is false and limits are null.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "is_premium": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "stored_limits": {
+                                            "properties": {
+                                                "calories": {
+                                                    "type": "integer",
+                                                    "example": 1800,
+                                                    "nullable": true
+                                                },
+                                                "proteins": {
+                                                    "type": "number",
+                                                    "example": 135,
+                                                    "nullable": true
+                                                },
+                                                "fats": {
+                                                    "type": "number",
+                                                    "example": 50,
+                                                    "nullable": true
+                                                },
+                                                "carbs": {
+                                                    "type": "number",
+                                                    "example": 180,
+                                                    "nullable": true
+                                                },
+                                                "water": {
+                                                    "type": "number",
+                                                    "example": 2.3,
+                                                    "nullable": true
+                                                },
+                                                "steps": {
+                                                    "type": "integer",
+                                                    "example": 8000,
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "plan": {
+                                            "properties": {
+                                                "ready": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "goal": {
+                                                    "type": "string",
+                                                    "example": "lose_weight"
+                                                },
+                                                "bmi": {
+                                                    "properties": {
+                                                        "value": {
+                                                            "type": "number",
+                                                            "example": 24.5
+                                                        },
+                                                        "classification": {
+                                                            "type": "string",
+                                                            "example": "норма"
+                                                        },
+                                                        "ideal_weight_broca_kg": {
+                                                            "type": "integer",
+                                                            "example": 75
+                                                        },
+                                                        "ideal_weight_lorentz_kg": {
+                                                            "type": "number",
+                                                            "example": 70
+                                                        },
+                                                        "parameters_used": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string"
+                                                            },
+                                                            "example": [
+                                                                "weight",
+                                                                "height",
+                                                                "age",
+                                                                "gender"
+                                                            ]
+                                                        },
+                                                        "optional": {
+                                                            "description": "waist, hips, neck, chest, WHtR, WHR, Navy body fat, Pignet when measurements exist",
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "calculator": {
+                                                    "properties": {
+                                                        "used": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "mifflin_st_jeor",
+                                                                "extended"
+                                                            ]
+                                                        },
+                                                        "free": {
+                                                            "description": "Mifflin-St Jeor BMR, TDEE, calories_target",
+                                                            "type": "object"
+                                                        },
+                                                        "extended": {
+                                                            "description": "null without premium",
+                                                            "type": "object",
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "limits": {
+                                                    "properties": {
+                                                        "daily": {
+                                                            "type": "object"
+                                                        },
+                                                        "weekly": {
+                                                            "description": "daily × 7",
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "weekly_regime": {
+                                                    "description": "KBJU proportions, meal split 25/35/30/10, 7 days. Each meal has items with grams and KBJU; day totals ≈ daily limit. Products rotate by user and weekday, filtered by diet/allergies.",
+                                                    "type": "object"
+                                                },
+                                                "product_recommendations": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "health": {
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            }
+        },
+        "/api/profile/nutrition/recalculate": {
+            "post": {
+                "tags": [
+                    "Nutrition"
+                ],
+                "summary": "Recalculate and save nutrition targets",
+                "description": "Writes daily calories, proteins, fats, carbs, water and steps to the user. Uses Mifflin-St Jeor for free users and the extended calculator for premium.",
+                "operationId": "recalculateNutritionPlan",
+                "responses": {
+                    "200": {
+                        "description": "Targets updated"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Profile incomplete (need weight, height, age, gender, activity_level)"
+                    }
+                },
+                "security": [
+                    {
+                        "userSanctumToken": []
+                    }
+                ]
+            }
+        },
         "/api/premium/purchase": {
             "post": {
                 "tags": [
@@ -3022,6 +3219,7 @@
                                 "weight",
                                 "height",
                                 "age",
+                                "gender",
                                 "activity"
                             ]
                         }
@@ -3046,6 +3244,7 @@
                                                 "weight",
                                                 "height",
                                                 "age",
+                                                "gender",
                                                 "activity"
                                             ],
                                             "example": "name"
@@ -3084,6 +3283,14 @@
                                                     "type": "integer",
                                                     "nullable": true
                                                 },
+                                                "gender": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "male",
+                                                        "female"
+                                                    ],
+                                                    "nullable": true
+                                                },
                                                 "activity_level": {
                                                     "type": "string",
                                                     "enum": [
@@ -3108,6 +3315,7 @@
                                                 "weight",
                                                 "height",
                                                 "age",
+                                                "gender",
                                                 "activity"
                                             ]
                                         }
@@ -3137,7 +3345,7 @@
                     "Questionnaire"
                 ],
                 "summary": "Update questionnaire step",
-                "description": "Saves data for current step and returns next step",
+                "description": "Saves data for current step and returns next step. Completing activity writes Mifflin/extended nutrition targets (calories, KBJU, water, steps).",
                 "operationId": "updateQuestionnaire",
                 "parameters": [
                     {
@@ -3153,6 +3361,7 @@
                                 "weight",
                                 "height",
                                 "age",
+                                "gender",
                                 "activity"
                             ]
                         }
@@ -3248,6 +3457,22 @@
                                             "age": {
                                                 "type": "integer",
                                                 "example": 30
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    {
+                                        "required": [
+                                            "gender"
+                                        ],
+                                        "properties": {
+                                            "gender": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "male",
+                                                    "female"
+                                                ],
+                                                "example": "female"
                                             }
                                         },
                                         "type": "object"
@@ -3399,6 +3624,24 @@
                                                 "type": "string",
                                                 "example": "lactose"
                                             }
+                                        },
+                                        "product_recommendations": {
+                                            "description": "Foods filtered by diet and allergies",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "group": {
+                                                        "type": "string"
+                                                    },
+                                                    "role": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
                                         }
                                     },
                                     "type": "object"
@@ -3496,6 +3739,12 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Данные обновлены"
+                                        },
+                                        "product_recommendations": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
                                         }
                                     },
                                     "type": "object"
@@ -6015,6 +6264,10 @@
                                         "editing": {
                                             "type": "boolean",
                                             "example": false
+                                        },
+                                        "plan": {
+                                            "description": "Calculated daily/weekly limits and BMI",
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -6098,6 +6351,9 @@
                                 "target_weight",
                                 "activity_level",
                                 "calories",
+                                "proteins",
+                                "fats",
+                                "carbs",
                                 "water",
                                 "steps"
                             ],
@@ -6207,6 +6463,9 @@
                                             "current_weight",
                                             "activity_level",
                                             "calories",
+                                            "proteins",
+                                            "fats",
+                                            "carbs",
                                             "water",
                                             "steps"
                                         ],
@@ -6251,6 +6510,14 @@
                                                 "maximum": 5000,
                                                 "minimum": 1000,
                                                 "example": 2000
+                                            },
+                                            {
+                                                "description": "For proteins/fats/carbs (grams)",
+                                                "type": "number",
+                                                "format": "float",
+                                                "maximum": 500,
+                                                "minimum": 0,
+                                                "example": 135
                                             },
                                             {
                                                 "description": "For daily water intake (liters)",
@@ -8075,6 +8342,14 @@
                                         "editing": {
                                             "type": "boolean",
                                             "example": false
+                                        },
+                                        "calculated_data": {
+                                            "description": "BMR, BMI, calories for legacy clients",
+                                            "type": "object"
+                                        },
+                                        "plan": {
+                                            "description": "Full nutrition/BMI plan from GET /api/profile/nutrition",
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -8611,6 +8886,27 @@
                         "description": "Daily calorie goal",
                         "type": "integer",
                         "example": 2000,
+                        "nullable": true
+                    },
+                    "proteins": {
+                        "description": "Daily protein goal in grams",
+                        "type": "number",
+                        "format": "float",
+                        "example": 135,
+                        "nullable": true
+                    },
+                    "fats": {
+                        "description": "Daily fat goal in grams",
+                        "type": "number",
+                        "format": "float",
+                        "example": 60,
+                        "nullable": true
+                    },
+                    "carbs": {
+                        "description": "Daily carb goal in grams",
+                        "type": "number",
+                        "format": "float",
+                        "example": 200,
                         "nullable": true
                     },
                     "water": {
@@ -9476,6 +9772,10 @@
         {
             "name": "Moderator Authentication",
             "description": "Moderator authentication endpoints"
+        },
+        {
+            "name": "Nutrition",
+            "description": "Mifflin-St Jeor nutrition plan, daily/weekly KBJU+water+steps limits, weekly meal regime and BMI. Free: Mifflin. Premium: extended calculator."
         },
         {
             "name": "Premium",

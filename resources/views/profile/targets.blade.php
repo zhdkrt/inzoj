@@ -38,9 +38,9 @@
             <button type="submit" class="rounded w-full flex justify-between py-3 px-4 font-medium bg-white border">
                 <label class="text-md">{{ $label }}</label>
                 {{ $current_field ?? 'Не указано' }}
-                @if ($field == 'calories')
+                @if (in_array($field, ['calories', 'proteins', 'fats', 'carbs', 'water']))
                     <br><label class="text-md">Недельная цель</label>
-                    {{ $current_field * 7 ?? 'Не указано' }}
+                    {{ $current_field !== null ? $current_field * 7 : 'Не указано' }}
                 @endif
             </button>
         </form>

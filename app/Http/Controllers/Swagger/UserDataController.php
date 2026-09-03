@@ -36,7 +36,9 @@ use Illuminate\Http\Request;
  *                 description="Available fields with their display names",
  *                 @OA\AdditionalProperties(type="string", example="Текущий вес")
  *             ),
- *             @OA\Property(property="editing", type="boolean", example=false)
+ *             @OA\Property(property="editing", type="boolean", example=false),
+ *             @OA\Property(property="calculated_data", type="object", description="BMR, BMI, calories for legacy clients"),
+ *             @OA\Property(property="plan", type="object", description="Full nutrition/BMI plan from GET /api/profile/nutrition")
  *         )
  *     ),
  *     

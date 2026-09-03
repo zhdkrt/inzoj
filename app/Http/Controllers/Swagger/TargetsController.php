@@ -47,7 +47,8 @@ use Illuminate\Http\Request;
      *                     example="Цель"
      *                 )
      *             ),
-     *             @OA\Property(property="editing", type="boolean", example=false)
+     *             @OA\Property(property="editing", type="boolean", example=false),
+ *             @OA\Property(property="plan", type="object", description="Calculated daily/weekly limits and BMI")
      *         )
      *     ),
      *     
@@ -92,7 +93,7 @@ use Illuminate\Http\Request;
      *         required=true,
      *         @OA\Schema(
      *             type="string",
-     *             enum={"goal", "current_weight", "target_weight", "activity_level", "calories", "water", "steps"},
+     *             enum={"goal", "current_weight", "target_weight", "activity_level", "calories", "proteins", "fats", "carbs", "water", "steps"},
      *             example="goal"
      *         )
      *     ),
@@ -161,7 +162,7 @@ use Illuminate\Http\Request;
      *                     property="field",
      *                     type="string",
      *                     description="Field to update",
-     *                     enum={"goal", "target_weight", "current_weight", "activity_level", "calories", "water", "steps"},
+     *                     enum={"goal", "target_weight", "current_weight", "activity_level", "calories", "proteins", "fats", "carbs", "water", "steps"},
      *                     example="water"
      *                 ),
      *                 @OA\Property(
@@ -188,13 +189,21 @@ use Illuminate\Http\Request;
      *                             enum={"low", "medium", "high", "expert"},
      *                             example="medium"
      *                         ),
-     *                         @OA\Schema(
-     *                             type="integer",
-     *                             description="For daily calorie goal",
-     *                             minimum=1000,
-     *                             maximum=5000,
-     *                             example=2000
-     *                         ),
+ *                         @OA\Schema(
+ *                             type="integer",
+ *                             description="For daily calorie goal",
+ *                             minimum=1000,
+ *                             maximum=5000,
+ *                             example=2000
+ *                         ),
+ *                         @OA\Schema(
+ *                             type="number",
+ *                             format="float",
+ *                             description="For proteins/fats/carbs (grams)",
+ *                             minimum=0,
+ *                             maximum=500,
+ *                             example=135
+ *                         ),
      *                         @OA\Schema(
      *                             type="number",
      *                             format="float",
